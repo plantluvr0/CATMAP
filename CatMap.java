@@ -1,6 +1,10 @@
+/*
+app that checks location
+ */
 
 import java.io.*;
 import java.util.*;
+
 public class CatMap {
     public ArrayList<Building> buildingsList;
     public ArrayList<Path> pathsList;

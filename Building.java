@@ -1,6 +1,6 @@
-
 import java.util.ArrayList;
 import java.util.Scanner;
+
 public class Building {
     private String name;
     private String campus;

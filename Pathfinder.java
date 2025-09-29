@@ -1,4 +1,6 @@
 
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -6,7 +8,7 @@ import java.util.PriorityQueue;
 
 public class Pathfinder {
 
-    public ArrayList<ArrayList<ArrayList<Integer>>> constructAdj(int[][] edges, int V){
+    public static ArrayList<ArrayList<ArrayList<Integer>>> constructAdj(int[][] edges, int V){
         ArrayList<ArrayList<ArrayList<Integer>>> adj = new ArrayList<>();
         for (int i = 0; i < V; i++) {
             adj.add(new ArrayList<>());

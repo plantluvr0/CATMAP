@@ -1,36 +1,32 @@
-
-
 public class Path {
-    private double length;
-    private double incline;
+    private Step[] steps;
+    private double incline = 0, totalDis = 0, time;
+    //constants
     private final double SPEED_ON_FLAT = 1.2;
     private final double SPEED_ON_INCLINE = 0.83;
 
-    public Path(double len, double incl){
-        length = len;
-        incline = incl;
-    }
-    public double time(){
-        if (incline > 0) {
-            return (length/SPEED_ON_INCLINE);
-        } else {
-            return (length/SPEED_ON_FLAT);
+    public Path(Step[] steps){
+        this.steps = steps;
+        for (Step step : steps) {
+            incline += step.getIncline();
+            totalDis += step.getDistance();
         }
+        time = totalDis * SPEED_ON_FLAT;
     }
-    /**
-     *
-     * @param len
-     * @param incl
-     * @return
-     */
-    //TODO CHANGE ALL THIS
-    public double cost(){
-        double len = this.length;
-        double incl = this.incline;
-        return ((len*0.35+incl*0.65)/(len+incl));
-    }
-    public boolean touching(){
 
-        return true;
+    public Step[] getSteps(){
+        return steps;
+    }
+
+    public double getIncline(){
+        return incline;
+    }
+
+    public double getDistance(){
+        return totalDis;
+    }
+
+    public double getTime(){
+        return time;
     }
 }
