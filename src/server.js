@@ -46,8 +46,8 @@ app.post('/data/new', (req, res) => {
     if (error) {
         res.status(400).json({ message: error.details[0].message });
     } else {
-
-
+        pool.query('INSERT INTO new_paths (username, steps, time, rate) ($1, $2, $3, $4)',
+            [body.username, body.steps, body.time, body.rate]);
     }
 });
 

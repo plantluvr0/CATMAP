@@ -1,34 +1,40 @@
 public class Node {
-     private String name;
-     private int x_cord;
-     private int y_cord;
-     private Step[] closest;
+    //global fields
+    private static int nodeCount = 0;
 
-     public Node(String name, int x_cord, int y_cord, Step[] closest) {
-         this.name = name;
-         this.x_cord = x_cord;
-         this.y_cord = y_cord;
-         this.closest = closest;
-     }
+    private int id;
+    private String name;
+    private int x_cord;
+    private int y_cord;
+    private Step[] closest;
 
-     public String getName() {
-         return name;
-     }
+    public Node(String name, int x_cord, int y_cord, Step[] closest) {
+        nodeCount++;
+        this.id = nodeCount;
+        this.name = name;
+        this.x_cord = x_cord;
+        this.y_cord = y_cord;
+        this.closest = closest;
+    }
 
-     public int getXCord() {
-         return x_cord;
-     }
+    public String getName() {
+     return name;
+    }
 
-     public int getYCord() {
-         return y_cord;
-     }
+    public int getXCord() {
+     return x_cord;
+    }
 
-     public Step[] getClosest() {
-         return closest;
-     }
+    public int getYCord() {
+     return y_cord;
+    }
 
-     public boolean equals(Object obj) {
-         Node oNode = (Node) obj;
-         return name.equals(oNode.getName());
-     }
+    public Step[] getClosest() {
+     return closest;
+    }
+
+    public boolean equals(Object obj) {
+        Node oNode = (Node) obj;
+        return name.equals(oNode.getName());
+    }
 }

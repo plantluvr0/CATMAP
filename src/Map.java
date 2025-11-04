@@ -6,21 +6,34 @@ import java.util.ArrayList;
 public class Map {
     //Fields
     private ArrayList<ArrayList<Node>> map;
+    private int width;
 
-    public Map() {
-        map = new ArrayList<ArrayList<Node>>(100);
+    public Map(int width) {
+        map = new ArrayList<ArrayList<Node>>(width);
     }
 
     public void addNode(Node newNode) {
-        map[newNode.getXCord()][newNode.getYCord()] = newNode;
+        map.get(newNode.getXCord()).set(newNode.getYCord(), newNode);
     }
 
     public void removeNode(int x, int y) {
-        map[x][y] = null;
+        map.get(x).set(y, null);
     }
 
     public Node getNode(int x, int y) {
-        return map[x][y];
+        return map.get(x).get(y);
+    }
+
+    public ArrayList<Node> getRow(int x) {
+        return map.get(x);
+    }
+
+    public void setNull(int x, int y) {
+        map.get(x).set(y, null);
+    }
+
+    public int getWidth() {
+        return width;
     }
 
     public Path Astar(Node start, Node goal) {
