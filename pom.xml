@@ -7,7 +7,7 @@
 
     <!-- 2. Project Coordinates (Required) -->
     <groupId>com.catmap</groupId>
-    <artifactId>catmap</artifactId>
+    <artifactId>Catmap</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <!-- 3. Properties (Define Java/Dependency Versions) -->

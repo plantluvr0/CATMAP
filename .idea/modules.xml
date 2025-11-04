@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CATMAP.iml" filepath="$PROJECT_DIR$/CATMAP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Catmap.iml" filepath="$PROJECT_DIR$/Catmap.iml" />
     </modules>
   </component>
 </project>
