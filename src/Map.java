@@ -36,7 +36,7 @@ public class Map {
         return width;
     }
 
-    public Path Astar(Node start, Node goal) {
+    public PathAstar(Node start, Node goal) {
         //TODO check if the nodes are on the map
 
         Step[] steps = new Step[50];
