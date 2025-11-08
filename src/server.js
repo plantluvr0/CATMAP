@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/map', (req, res) => {
     const json = {};
-    json.map = pool.query('SELECT * FROM map').rows;
+    json.edges = pool.query('SELECT * FROM edges').rows;
     json.nodes = pool.query('SELECT * FROM nodes').rows;
     res.status(202).set('Cache-Control', 'no-cache')
     res.json(json);
@@ -46,8 +46,8 @@ app.post('/data/new', (req, res) => {
     if (error) {
         res.status(400).json({ message: error.details[0].message });
     } else {
-        pool.query('INSERT INTO new_paths (username, steps, time, rate) ($1, $2, $3, $4)',
-            [body.username, body.steps, body.time, body.rate]);
+        pool.query('INSERT INTO new_paths (username, edges, time, rate) ($1, $2, $3, $4)',
+            [body.username, body.edges, body.time, body.rate]);
     }
 });
 

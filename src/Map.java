@@ -6,18 +6,29 @@ import java.util.ArrayList;
 public class Map {
     //Fields
     private ArrayList<ArrayList<Node>> map;
+    private ArrayList<Node> nodes;
     private int width;
 
     public Map(int width) {
         map = new ArrayList<ArrayList<Node>>(width);
     }
 
-    public void addNode(Node newNode) {
-        map.get(newNode.getXCord()).set(newNode.getYCord(), newNode);
+    public boolean addNode(Node newNode) {
+        if (map.get(newNode.getXCord()).get(newNode.getYCord()) == null) {
+            map.get(newNode.getXCord()).set(newNode.getYCord(), newNode);
+            nodes.add(newNode);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void removeNode(int x, int y) {
         map.get(x).set(y, null);
+    }
+
+    public ArrayList<Node> getNodes() {
+        return nodes;
     }
 
     public Node getNode(int x, int y) {
@@ -39,7 +50,7 @@ public class Map {
     public PathAstar(Node start, Node goal) {
         //TODO check if the nodes are on the map
 
-        Step[] steps = new Step[50];
+        Edge[] edges = new Edge[50];
         int i = 0;
 
         double fn = 0;
@@ -52,35 +63,35 @@ public class Map {
             //repeat until we get to goal
 
             double lowestTotalDis = 0;
-            Step bestStep = null;
-            Step[] closestSteps = curr.getClosest();
-            for (Step step : closestSteps) {
-                double stepH = h(step, goal);
+            Edge bestEdge = null;
+            Edge[] closestEdges = curr.getClosest();
+            for (Edge edge : closestEdges) {
+                double stepH = h(edge, goal);
                 if (stepH < lowestTotalDis) {
                     lowestTotalDis = stepH;
-                    bestStep = step;
+                    bestEdge = edge;
                 }
             }
 
-            assert bestStep != null;
-            steps[i] = bestStep;
+            assert bestEdge != null;
+            edges[i] = bestEdge;
             i++;
-            fn += bestStep.getDistance();
-            curr = bestStep.getEnd();
+            fn += bestEdge.getDistance();
+            curr = bestEdge.getEnd();
         }
 
-        return new Path(steps);
+        return new Path(edges);
     }
 
-    public double h(Step step, Node goal) {
-        int nextXCord = step.getEnd().getXCord();
-        int nextYCord = step.getEnd().getYCord();
+    public double h(Edge edge, Node goal) {
+        int nextXCord = edge.getEnd().getXCord();
+        int nextYCord = edge.getEnd().getYCord();
         int goalXCord = goal.getXCord();
         int goalYCord = goal.getYCord();
 
         double nextToGoal = Math.sqrt(Math.pow(Math.abs(nextXCord - goalXCord), 2)
                 + Math.pow(Math.abs(nextYCord - goalYCord), 2));
 
-        return step.getDistance() + nextToGoal;
+        return edge.getDistance() + nextToGoal;
     }
 }

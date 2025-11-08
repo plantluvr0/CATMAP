@@ -17,12 +17,45 @@
         <postgresql.version>42.7.8</postgresql.version>
     </properties>
 
-    <!-- 4. Dependencies (The Core Requirement) -->
+    <!-- 4. Builds -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version> <configuration>
+                <mainClass>your.package.YourMainApplication</mainClass>
+            </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- 5. Dependencies (The Core Requirement) -->
     <dependencies>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>21.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>21</version>
+        </dependency>
+        <dependency>
+            <groupId>de.fhpotsdam</groupId>
+            <artifactId>unfolding</artifactId>
+            <version>0.9.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.processing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.3.7</version>
         </dependency>
     </dependencies>
 
