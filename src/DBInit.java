@@ -4,10 +4,11 @@ Driver that configures and seeds the DB
 
 import java.sql.Connection;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DBInit {
     public static void main(String[] args) {
-        Map map = new Map(100);
+        Map map = new Map();
 
         //add whatever nodes are needed
         //add to null spaces
@@ -19,14 +20,14 @@ public class DBInit {
 
         try (Connection conn = DriverManager.getConnection(url, System.getenv("DB_USER"), System.getenv("DB_PASS"));) {
             for (Node node: map.getNodes()) {
-                Edge[] closest = node.getClosest();
+                ArrayList<double[]> neighbors = node.getNeighbors();
 
                 //setting up the sql array
-                Integer[] closestIds = new Integer[closest.length];
-                for (int i =  0; i < closest.length; i++) {
-                    closestIds[i] = closest[i].getId();
+                double[][] javaArray = new double[neighbors.size()][3];
+                for (int i = 0; i < neighbors.size(); i++) {
+                     javaArray[i] = neighbors.get(i);
                 }
-                java.sql.Array sqlArray = conn.createArrayOf("INTEGER", closestIds);
+                java.sql.Array sqlArray = conn.createArrayOf("Double", javaArray);
 
                 //adding the node
                 try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO nodes (*) VALUES (?, ?, ?, ?, ?)")) {
@@ -39,28 +40,13 @@ public class DBInit {
 
                     int rowsUpdated = pstmt.executeUpdate();
                 } catch (SQLException e) {
-                    System.out.println("Prepared statement to add the nodes to the node table: " + e.getMessage());
-                }
-
-                //adding the edges
-                for (Edge edge: closest) {
-                    try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO edges (*) VALUES (?, ?, ?, ?, ?)")) {
-                        //sets ?'s
-                        pstmt.setInt(1, edge.getId());
-                        pstmt.setInt(2, edge.getStart().getId());
-                        pstmt.setInt(3, edge.getEnd().getId());
-                        pstmt.setDouble(4, edge.getDistance());
-                        pstmt.setDouble(5, edge.getIncline());
-
-                        int rowsUpdated = pstmt.executeUpdate();
-                    } catch (SQLException e) {
-                        System.out.println("Prepared statement to add edge with id " + edge.getId() + ":" + e.getMessage());
-                    }
+                    System.out.println(String.format("Prepared statement to add the node %s to the node table: "
+                            + e.getMessage(), node.getName()));
                 }
 
             }
         } catch (SQLException e) {
-            System.out.println("Trying to connect to the database" + e.getMessage());
+            System.out.println("Tried to connect to the database" + e.getMessage());
         }
     }
 }

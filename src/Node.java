@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Node {
     //global fields
     private static int nodeCount = 0;
@@ -6,15 +8,15 @@ public class Node {
     private String name;
     private int x_cord;
     private int y_cord;
-    private Edge[] closest;
+    private ArrayList<double[]> neighbors;
 
-    public Node(String name, int x_cord, int y_cord, Edge[] closest) {
+    public Node(String name, int x_cord, int y_cord) {
         nodeCount++;
         this.id = nodeCount;
         this.name = name;
         this.x_cord = x_cord;
         this.y_cord = y_cord;
-        this.closest = closest;
+        neighbors = new ArrayList<double[]>();
     }
 
     public int getId() {
@@ -33,10 +35,35 @@ public class Node {
      return y_cord;
     }
 
-    public Edge[] getClosest() {
-     return closest;
+    public boolean addNeighbor(double id, double weight, double count) {
+        boolean isThere  = false;
+        for (double[] neighbor : neighbors) {
+            if (neighbor[0] == id) {
+                isThere = true;
+                break;
+            }
+        }
+        if (!isThere) {
+            neighbors.add(new double[]{id, weight, count});
+            return true;
+        } else
+            return false;
     }
 
+    public ArrayList<double[]> getNeighbors() {
+        return neighbors;
+    }
+
+    public double[] getNeighbor(double id) {
+        for  (double[] neighbor : neighbors) {
+            if(id == neighbor[0]) {
+                return neighbor;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         Node oNode = (Node) obj;
         return name.equals(oNode.getName());

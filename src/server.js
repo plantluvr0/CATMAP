@@ -1,5 +1,6 @@
 import { Pool } from 'pg'
 
+const Joi = require('joi');
 const express = require('express');
 const app = express();
 const port = process.env.PORT;
@@ -35,23 +36,42 @@ app.get('/path', (req, res) => {
 app.post('/data/new', (req, res) => {
     const { body } = req;
     const schema = Joi.object({
-        username: Joi.string().required(),
-        steps: Joi.array(),
-        time: Joi.number().integer(),
-        rate: Joi.number().integer()
+        nodes: Joi.array()
+            .items( Joi.object({
+                startNodeId: Joi.number()
+                    .integer(),
+                endNodeId: Joi.number()
+                    .integer(),
+                time: Joi.number()
+        }) )
     });
 
     //input val
     const { error } = schema.validate(body);
-    if (error) {
-        res.status(400).json({ message: error.details[0].message });
+    if (!error) {
+        // actual work
+        body.nodes.forEach((item) => {
+            const { rows } = pool.query('SElECT id and neighbors FROM nodes WHERE nodeId = $1 and nodeId = $2', [item.startNodeId, item.endNodeId]);
+            rows.forEach((node) => {
+                node.neighbors.forEach((neighbor, index) => {
+                    const newWeight = updateWeight(neighbor.weight, neighbor.counter, item.time, neighbor.distance, neighbor.slope)
+                    const newCounter = neighbor.counter + 1;
+                    pool.query("UPDATE nodes SET neighbors = jsonb_set(jsonb_set(neighbors, '{$1, weight}', '$2'), '{$1, counter}', $3)" +
+                        " WHERE nodeId = $4", [index, newWeight, newCounter, node.id]);
+                })
+            })
+        })
     } else {
-        pool.query('INSERT INTO new_paths (username, edges, time, rate) ($1, $2, $3, $4)',
-            [body.username, body.edges, body.time, body.rate]);
+        res.status(400).json({ message: error.details[0].message });
     }
 });
 
 app.listen(port, () => {
-    console.log(`listening on port ${port}`)
+    console.log(`listening on port ${port}`);
 });
+
+function updateWeight(curr, counter, time, distance, slope) {
+    let newWeight = (time * distance) / slope;
+    return ((curr * counter) + newWeight) / (counter + 1);
+}
 
