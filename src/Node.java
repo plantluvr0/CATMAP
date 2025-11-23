@@ -6,11 +6,11 @@ public class Node {
 
     private int id;
     private String name;
-    private int x_cord;
-    private int y_cord;
+    private double x_cord;
+    private double y_cord;
     private ArrayList<double[]> neighbors;
 
-    public Node(String name, int x_cord, int y_cord) {
+    public Node(String name, double x_cord, double y_cord) {
         nodeCount++;
         this.id = nodeCount;
         this.name = name;
@@ -27,24 +27,24 @@ public class Node {
      return name;
     }
 
-    public int getXCord() {
+    public double getXCord() {
      return x_cord;
     }
 
-    public int getYCord() {
+    public double getYCord() {
      return y_cord;
     }
 
-    public boolean addNeighbor(double id, double weight, double count) {
+    public boolean addNeighbor(Node node, double weight) {
         boolean isThere  = false;
         for (double[] neighbor : neighbors) {
-            if (neighbor[0] == id) {
+            if (neighbor[0] == node.id) {
                 isThere = true;
                 break;
             }
         }
         if (!isThere) {
-            neighbors.add(new double[]{id, weight, count});
+            neighbors.add(new double[]{node.id, weight, 0});
             return true;
         } else
             return false;
