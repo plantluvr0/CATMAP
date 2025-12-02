@@ -1,38 +1,43 @@
-import { Pool } from 'pg'
+import { Pool } from 'pg';
+import { Connector } from "@google-cloud/cloud-sql-connector";
+import Joi from 'joi';
+import express from 'express'
 
-const Joi = require('joi');
-const express = require('express');
+//sets up server
 const app = express();
 const port = process.env.PORT;
+//
 
 //sets up db pool
-const pool = new Pool({
-    host: "localhost",
+const connector = new Connector();
+const clientops = await connector.getOptions({
+    instanceConnectionName: "catmap-474717:us-central1:catmapsql1",
+    ipType: "PUBLIC"
+})
+const pool = await new Pool({
+    ...clientops,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    max: 20
+    database: "postgres",
+    max: 5
 });
+//
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/map', (req, res) => {
-    const json = {};
-    json.nodes = pool.query('SELECT * FROM nodes').rows;
-    res.status(202).set('Cache-Control', 'no-cache')
-    res.json(json);
+app.get('/', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM nodes');
+        res.status(202).set('Cache-Control', 'no-cache');
+        res.json(rows);
+    } catch (err) {
+        console.error('Database connection failed:', err.stack);
+        res.status(404).json({message: 'could not retrieve data'})
+    }
 });
 
-app.get('/path', (req, res) => {
-    const { start, end } = req.query;
-    const path = pool.query('SELECT * FROM paths WHERE start_node = $1 and end_node = $2', [start, end]);
-    res.status(202).set('Cache-Control', 'no-cache');
-    res.json(path.rows);
-});
-
-app.post('/data/new', (req, res) => {
+app.post('/data/new', async (req, res) => {
     const { body } = req;
     const schema = Joi.object({
         nodes: Joi.array()
@@ -49,19 +54,19 @@ app.post('/data/new', (req, res) => {
     const { error } = schema.validate(body);
     if (!error) {
         // actual work
-        body.nodes.forEach((item) => {
-            const { rows } = pool.query('SElECT id and neighbors FROM nodes WHERE nodeId = $1 and nodeId = $2', [item.startNodeId, item.endNodeId]);
+        for (const item of body.nodes) {
+            const { rows } = await pool.query('SElECT id and neighbors FROM nodes WHERE nodeId = $1 and nodeId = $2', [item.startNodeId, item.endNodeId]);
             rows.forEach((node) => {
-                node.neighbors.forEach((neighbor, index) => {
+                node.neighbors.forEach( async (neighbor, index) => {
                     if (neighbor.id === item.startNodeId || neighbor.id === item.endNodeId) {
                         const newWeight = updateWeight(neighbor.weight, neighbor.counter, item.time, neighbor.distance, neighbor.slope)
                         const newCounter = neighbor.counter + 1;
-                        pool.query("UPDATE nodes SET neighbors = jsonb_set(jsonb_set(neighbors, '{$1, weight}', '$2'), '{$1, counter}', $3)" +
+                        await pool.query("UPDATE nodes SET neighbors = jsonb_set(jsonb_set(neighbors, '{$1, weight}', '$2'), '{$1, counter}', $3)" +
                             " WHERE nodeId = $4", [index, newWeight, newCounter, node.id]);
                     }
                 })
             })
-        })
+        }
     } else {
         res.status(400).json({ message: error.details[0].message });
     }

@@ -1,19 +1,27 @@
-import { Pool } from 'pg'
+import { Pool } from 'pg';
+import { Connector } from "@google-cloud/cloud-sql-connector";
+import Joi from 'joi';
+import express from 'express'
 
-const Joi = require('joi');
-const express = require('express');
+//sets up server
 const app = express();
 const port = process.env.PORT;
+//
 
 //sets up db pool
-const pool = new Pool({
-    host: "localhost",
+const connector = new Connector();
+const clientops = await connector.getOptions({
+    instanceConnectionName: "catmap-474717:us-central1:catmapsql1",
+    ipType: "PUBLIC"
+})
+const pool = await new Pool({
+    ...clientops,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    max: 20
+    database: "postgres",
+    max: 5
 });
+//
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -23,13 +31,6 @@ app.get('/map', (req, res) => {
     json.nodes = pool.query('SELECT * FROM nodes').rows;
     res.status(202).set('Cache-Control', 'no-cache')
     res.json(json);
-});
-
-app.get('/path', (req, res) => {
-    const { start, end } = req.query;
-    const path = pool.query('SELECT * FROM paths WHERE start_node = $1 and end_node = $2', [start, end]);
-    res.status(202).set('Cache-Control', 'no-cache');
-    res.json(path.rows);
 });
 
 app.post('/data/new', (req, res) => {
