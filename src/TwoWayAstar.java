@@ -1,10 +1,11 @@
 import java.util.ArrayList;
 import java.util.*;
+import java.util.HashMap;
 public class TwoWayAstar {
-    private ArrayList<Node> openSetStart;
-    private ArrayList<Node> openSetGoal;
-    private ArrayList<Node> closedSetStart;
-    private ArrayList<Node> closedSetGoal;
+    private final ArrayList<Node> openSetStart;
+    private final ArrayList<Node> openSetGoal;
+    private final ArrayList<Node> closedSetStart;
+    private final ArrayList<Node> closedSetGoal;
     private ArrayList<Node> path;
 
     public TwoWayAstar() {
@@ -21,10 +22,10 @@ public class TwoWayAstar {
      */
     public void findPath(Node start, Node goal) {
         // parent maps for each search direction (do not rely on Node having parent field)
-        Map<Node, Node> parentStart = new HashMap<>();
-        Map<Node, Node> parentGoal = new HashMap<>();
-        Map<Node, Double> gStart = new HashMap<>();
-        Map<Node, Double> gGoal = new HashMap<>();
+        HashMap<Node, Node> parentStart = new HashMap<>();
+        HashMap<Node, Node> parentGoal = new HashMap<>();
+        HashMap<Node, Double> gStart = new HashMap<>();
+        HashMap<Node, Double> gGoal = new HashMap<>();
 
         openSetStart.clear();
         openSetGoal.clear();
@@ -63,7 +64,7 @@ public class TwoWayAstar {
             // Expand neighbors from start side
             List<Node> neighStart = getNeighbors(currentStart);
             for (Node neighbor : neighStart) {
-                if (!neighbor.walkable || closedSetStart.contains(neighbor)) continue;
+                if ( closedSetStart.contains(neighbor)) continue;
                 double tentativeG = gStart.getOrDefault(currentStart, Double.POSITIVE_INFINITY) + 1.0;
                 if (tentativeG < gStart.getOrDefault(neighbor, Double.POSITIVE_INFINITY)) {
                     parentStart.put(neighbor, currentStart);
@@ -75,7 +76,7 @@ public class TwoWayAstar {
             // Expand neighbors from goal side
             List<Node> neighGoal = getNeighbors(currentGoal);
             for (Node neighbor : neighGoal) {
-                if (!neighbor.walkable || closedSetGoal.contains(neighbor)) continue;
+                if ( closedSetGoal.contains(neighbor)) continue;
                 double tentativeG = gGoal.getOrDefault(currentGoal, Double.POSITIVE_INFINITY) + 1.0;
                 if (tentativeG < gGoal.getOrDefault(neighbor, Double.POSITIVE_INFINITY)) {
                     parentGoal.put(neighbor, currentGoal);
@@ -94,7 +95,7 @@ public class TwoWayAstar {
      * @return The Manhattan distance between node a and node b.
      */
     public double heuristic(Node a, Node b) {
-        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+        return Math.abs(a.getXCord() - b.getXCord()) + Math.abs(a.getYCord() - b.getYCord());
     }
 
     public void printPath(ArrayList<Node> path) {
@@ -107,7 +108,7 @@ public class TwoWayAstar {
     /**
      * Reconstructs full path from start to goal given meeting node and both parent maps.
      */
-    public ArrayList<Node> reconstructPath(Node meeting, Map<Node, Node> parentStart, Map<Node, Node> parentGoal) {
+    public ArrayList<Node> reconstructPath(Node meeting, HashMap<Node, Node> parentStart, HashMap<Node, Node> parentGoal) {
         ArrayList<Node> pathFromStart = new ArrayList<>();
         Node cur = meeting;
         while (cur != null) {
@@ -130,7 +131,7 @@ public class TwoWayAstar {
     }
 
     // Helper: choose and remove node from open with lowest f = g + heuristic(..., target)
-    private Node popLowestF(ArrayList<Node> open, Map<Node, Double> gMap, Node target) {
+    private Node popLowestF(ArrayList<Node> open, HashMap<Node, Double> gMap, Node target) {
         Node best = null;
         double bestF = Double.POSITIVE_INFINITY;
         for (Node n : open) {
@@ -174,7 +175,7 @@ public class TwoWayAstar {
             try {
                 java.lang.reflect.Method m = node.getClass().getMethod("getNeighbors");
                 Object val = m.invoke(node);
-                if (val == null) return Collections.emptyList();
+
                 if (val instanceof List) return (List<Node>) val;
                 if (val instanceof Node[]) return Arrays.asList((Node[]) val);
                 if (val instanceof Iterable) {
