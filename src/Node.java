@@ -4,11 +4,11 @@ public class Node {
     //global fields
     private static int nodeCount = 0;
 
-    private int id;
-    private String name;
-    private double x_cord;
-    private double y_cord;
-    private ArrayList<double[]> neighbors;
+    private final int id;
+    private final String name;
+    private final double x_cord;
+    private final double y_cord;
+    private final ArrayList<double[]> neighbors;
 
     public Node(String name, double x_cord, double y_cord) {
         nodeCount++;
@@ -16,7 +16,7 @@ public class Node {
         this.name = name;
         this.x_cord = x_cord;
         this.y_cord = y_cord;
-        neighbors = new ArrayList<double[]>();
+        neighbors = new ArrayList<>();
     }
 
     public int getId() {
