@@ -1,6 +1,7 @@
-@main
-        import SwiftUI
-        import MapKit
+import SwiftUI
+import MapKit
+import Foundation
+
 struct InteractiveMapView: View {
 
     // A model for a single point of interest
@@ -20,15 +21,15 @@ struct InteractiveMapView: View {
     )
 
 
-    let map = getMap()
-    let annotations
-    let nodes = map.getNodes()
-    for node in nodes {
-        if (node.isBuliding() == true) {
-            annotations.add(Location(name: node.getName(),
-                coordinate: CLLocationCoordinate2D(latitude: node.getXcord(), node.getYcord())))
-        }
-    }
+    //let map = getMap()
+    //let annotations
+    //let nodes = map.getNodes()
+    //for node in nodes {
+    //    if (node.isBuliding() == true) {
+    //        annotations.add(Location(name: node.getName(),
+    //            coordinate: CLLocationCoordinate2D(latitude: node.getXcord(), node.getYcord())))
+    //    }
+    //}
 
     var body: some View {
         // Use a ZStack to layer the detail box on top of the map
@@ -81,23 +82,23 @@ func getMap() -> Map {
         let nodes: [Node]
     }
 
-    let map
-    let response = await fetchData()
-    for strNode in response.nodes {
-        let node = Node(id: strNode.id, name: strNode.name, xpos: strNode.xpos, ypos: strNode.ypos)
-        for neighbor in strNode.neighbors {
-            node.addNeighbor(id: neighbor.id, weight: neighbor.weight, count: neighbor.count)
-        }
-        map.addNode(node: node)
-    }
+    //let map
+    //let response = await fetchData()
+    //for strNode in response.nodes {
+    //    let node = Node(id: strNode.id, name: strNode.name, xpos: strNode.xpos, ypos: strNode.ypos)
+    //    for neighbor in strNode.neighbors {
+    //        node.addNeighbor(id: neighbor.id, weight: neighbor.weight, count: neighbor.count)
+    //    }
+    //    map.addNode(node: node)
+    //}
 
-    return map
+    //return map
 
-    func fetchData() -> MapResponse async {
+    func fetchData() async -> MapResponse {
         // 2. Define the URL
         guard let url = URL(string: "https://api.example.com/data/123") else {
             print("Invalid URL")
-            return
+            return nil
         }
 
         do {
@@ -108,7 +109,7 @@ func getMap() -> Map {
             guard let httpResponse = response as? HTTPURLResponse,
             httpResponse.statusCode == 200 else {
                 print("Server error or unexpected status code.")
-                return
+                return nil
             }
 
             // 4. Decode the JSON data into your Swift structure
