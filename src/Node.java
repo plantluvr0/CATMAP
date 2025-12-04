@@ -43,19 +43,19 @@ public class Node {
      return y_cord;
     }
 
-    public boolean addNeighbor(Node node, double weight) {
+    public void addNeighbor(Node node) {
         boolean isThere  = false;
-        for (double[] neighbor : neighbors) {
+        double weight = (Math.abs(this.getXCord()-node.getXCord())) + Math.abs((this.getYCord()-node.getYCord()));
+        for ( double[] neighbor : neighbors) {
             if (neighbor[0] == node.id) {
                 isThere = true;
                 break;
             }
         }
         if (!isThere) {
-            neighbors.add(new double[]{node.id, weight, 0});
-            return true;
-        } else
-            return false;
+            neighbors.add(node.getId());
+            addNeighbor(this);
+        }
     }
 
     public ArrayList<double[]> getNeighbors() {
