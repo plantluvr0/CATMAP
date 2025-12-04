@@ -13,14 +13,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DBInit {
     public static void main(String[] args) {
         Map map = new Map();
-        Node a = new Node("A", 45.90, 25.70);
-        Node b = new Node("B", 15.40, 56.90);
-        Node c = new Node("C", 12.20, 78.80);
-        Node d = new Node("D", 78.14, 12.60);
-        Node e = new Node("E", 90.15, 2.70);
-
-        a.addNeighbor(b, 3.20);
-        a.addNeighbor(c, 4.20);
+        Node Ready = new Node("Ready", 44.485156 , 73.193409);
+        Node Mcann = new Node("Mcann", 44.484698 , 73.192807);
+        Node Richardson = new Node("Richardson",44.484894 , 73.193595 );
+        Node Sichel = new Node("Sichel",44.484872 , 73.193647 );
+        Node Hunt = new Node("Hunt",44.484959 , 73.193050 );
+        Node b5 = new Node("b5", 44.484856 , 73.193182);
+        b5.addNeighbor(Ready);
+        b5.addNeighbor(Mcann);
+        b5.addNeighbor(Richardson);
+        b5.addNeighbor(Sichel);
+        b5.addNeighbor(Hunt);
+        a.addNeighbor();
         a.addNeighbor(e, 1.20);
 
         b.addNeighbor(d, 1.20);
