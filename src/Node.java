@@ -19,6 +19,14 @@ public class Node {
         neighbors = new ArrayList<>();
     }
 
+    public Node(int id, String name, double x_cord, double y_cord) {
+        this.id = id;
+        this.name = name;
+        this.x_cord = x_cord;
+        this.y_cord = y_cord;
+        neighbors = new ArrayList<>();
+    }
+
     public int getId() {
         return id;
     }

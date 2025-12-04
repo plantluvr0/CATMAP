@@ -27,10 +27,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', async (req, res) => {
+    //serve html css js
+
+});
+
+app.get('/map', async (req, res) => {
     try {
+        let json;
         const { rows } = await pool.query('SELECT * FROM nodes');
-        res.status(202).set('Cache-Control', 'no-cache');
-        res.json(rows);
+        json.nodes = rows;
+        res.status(202).json(rows);
     } catch (err) {
         console.error('Database connection failed:', err.stack);
         res.status(404).json({message: 'could not retrieve data'})
@@ -55,14 +61,15 @@ app.post('/data/new', async (req, res) => {
     if (!error) {
         // actual work
         for (const item of body.nodes) {
-            const { rows } = await pool.query('SElECT id and neighbors FROM nodes WHERE nodeId = $1 and nodeId = $2', [item.startNodeId, item.endNodeId]);
+            const { rows } = await pool.query('SElECT id and neighbors FROM nodes WHERE nodeId = $1 and nodeId = $2',
+                [item.startNodeId, item.endNodeId]);
             rows.forEach((node) => {
                 node.neighbors.forEach( async (neighbor, index) => {
                     if (neighbor.id === item.startNodeId || neighbor.id === item.endNodeId) {
                         const newWeight = updateWeight(neighbor.weight, neighbor.counter, item.time, neighbor.distance, neighbor.slope)
                         const newCounter = neighbor.counter + 1;
-                        await pool.query("UPDATE nodes SET neighbors = jsonb_set(jsonb_set(neighbors, '{$1, weight}', '$2'), '{$1, counter}', $3)" +
-                            " WHERE nodeId = $4", [index, newWeight, newCounter, node.id]);
+                        await pool.query("UPDATE nodes SET neighbors = jsonb_set(jsonb_set(neighbors, '{$1, weight}', '$2')," +
+                            " '{$1, counter}', $3) WHERE nodeId = $4", [index, newWeight, newCounter, node.id]);
                     }
                 })
             })
