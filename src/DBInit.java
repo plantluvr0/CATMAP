@@ -13,33 +13,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DBInit {
     public static void main(String[] args) {
         Map map = new Map();
-        Node a = new Node("A", 45.90, 25.70);
-        Node b = new Node("B", 15.40, 56.90);
-        Node c = new Node("C", 12.20, 78.80);
-        Node d = new Node("D", 78.14, 12.60);
-        Node e = new Node("E", 90.15, 2.70);
+        //buildings
 
-        a.addNeighbor(b, 3.20);
-        a.addNeighbor(c, 4.20);
-        a.addNeighbor(e, 1.20);
+        //paths
 
-        b.addNeighbor(d, 1.20);
-        b.addNeighbor(e, 1.20);
+        //add neighbors
 
-        c.addNeighbor(a, 1.20);
-        c.addNeighbor(b, 1.12);
-
-        map.addNode(a);
-        map.addNode(b);
-        map.addNode(c);
-        map.addNode(d);
-        map.addNode(e);
 
         mapToDB(map);
-
-        //add whatever nodes are needed
-        //add to null spaces
-        //add to the db
     }
 
     public static void mapToDB(Map map) {

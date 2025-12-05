@@ -71,6 +71,10 @@ public class Node {
         return null;
     }
 
+    public boolean isBuilding() {
+        return false;
+    }
+
     @Override
     public boolean equals(Object obj) {
         Node oNode = (Node) obj;
