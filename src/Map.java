@@ -13,16 +13,10 @@ public class Map {
         nodes = new ArrayList<Node>();
     }
 
-    public boolean addNode(Node newNode) {
+    public void addNode(Node newNode) {
         if (!nodes.contains(newNode)) {
             nodes.add(newNode);
-            return true;
         }
-        return false;
-    }
-
-    public void removeNode(int id) {
-        nodes.removeIf(node -> node.getId() == id);
     }
 
     public ArrayList<Node> getNodes() {
@@ -41,4 +35,6 @@ public class Map {
     public int getWidth() {
         return width;
     }
+
+
 }

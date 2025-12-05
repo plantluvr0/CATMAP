@@ -22,10 +22,6 @@ public class Building extends Node{
 
  
 
-    @Override
-    public String toString() {
-        String str = String.format("%s,%s", name, xpos, ypos);
-        return str;
-    }
+
 
 }

@@ -1,6 +1,9 @@
 import java.util.ArrayList;
-import java.util.*;
 import java.util.HashMap;
+import java.util.List;
+import java.util.*;
+
+
 public class TwoWayAstar {
     private final ArrayList<Node> openSetStart;
     private final ArrayList<Node> openSetGoal;
@@ -16,10 +19,7 @@ public class TwoWayAstar {
         path = new ArrayList<>();
     }
 
-    /**
-     * @param start
-     * @param goal
-     */
+
     public void findPath(Node start, Node goal) {
         // parent maps for each search direction (do not rely on Node having parent field)
         HashMap<Node, Node> parentStart = new HashMap<>();
@@ -187,5 +187,19 @@ public class TwoWayAstar {
         } catch (Exception ignored) {}
         return Collections.emptyList();
     }
+    public String[] givepath(ArrayList<Node> path){
+        String[] nodespath = new String[path.size()];
+        int ctr = 0;
+        for(Node n : path){
+            nodespath[ctr] = n.getName();
+            ctr++;
+        }
+        return nodespath;
+    }
+    public ArrayList<Node> getPath(){
+        return path;
+    }
+
 }
+
 

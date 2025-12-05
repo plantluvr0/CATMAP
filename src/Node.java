@@ -8,7 +8,7 @@ public class Node {
     private final String name;
     private final double x_cord;
     private final double y_cord;
-    private final ArrayList<Integer> neighbors;
+    private final ArrayList<double[]> neighbors;
 
     public Node(String name, double x_cord, double y_cord) {
         nodeCount++;
@@ -46,25 +46,28 @@ public class Node {
     public void addNeighbor(Node node) {
         boolean isThere  = false;
         double weight = (Math.abs(this.getXCord()-node.getXCord())) + Math.abs((this.getYCord()-node.getYCord()));
-        for ( Integer neighbor : neighbors) {
-            if (neighbor == node.id) {
+        for ( double[] neighbor : neighbors) {
+            if (neighbor[0] == node.id) {
                 isThere = true;
                 break;
             }
         }
         if (!isThere) {
-            neighbors.add(node.getId());
-            addNeighbor(this);
+            double[] newNeighbor = new double[3];
+            newNeighbor[0] = node.id;
+            newNeighbor[1] = weight;
+            neighbors.add(newNeighbor);
+            node.addNeighbor(this);
         }
     }
 
-    public ArrayList<Integer> getNeighbors() {
+    public ArrayList<double[]> getNeighbors() {
         return neighbors;
     }
 
-    public Integer getNeighbor(double id) {
-        for  (Integer neighbor : neighbors) {
-            if(id == neighbor) {
+    public double[] getNeighbor(double id) {
+        for  (double[] neighbor : neighbors) {
+            if(id == neighbor[0]) {
                 return neighbor;
             }
         }
@@ -76,4 +79,5 @@ public class Node {
         Node oNode = (Node) obj;
         return name.equals(oNode.getName());
     }
+
 }

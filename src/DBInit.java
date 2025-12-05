@@ -130,6 +130,11 @@ public class DBInit {
         map.addNode(MarshLife);
         map.addNode(Aiken);
         map.addNode(Jeffords);
+        TwoWayAstar astar = new TwoWayAstar();
+
+
+        astar.findPath(Howe, Mcann);
+        System.out.println(astar.getPath());
 
         mapToDB(map);
 

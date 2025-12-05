@@ -1,88 +1,144 @@
 @main
-        import SwiftUI
-        import MapKit
-struct InteractiveMapView: View {
+import SwiftUI
+import MapKit
 
-    // A model for a single point of interest
+struct InteractiveMapView: View {
     struct Location: Identifiable {
         let id = UUID()
         let name: String
         let coordinate: CLLocationCoordinate2D
     }
 
-    // 1. STATE: Tracks which location is currently selected
-    @State private var selectedLocation: Location? = nil
-
-    // Define the region (center and span/zoom) as a @State variable
+    @State private var selectedStartLocation: Location? = nil
+    @State private var selectedEndLocation: Location? = nil
+    @State private var pathLocations: [Location] = []
     @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 34.0522, longitude: -118.2437), // Los Angeles, CA
-        span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1) // Zoom level
+        center: CLLocationCoordinate2D(latitude: 34.0522, longitude: -118.2437),
+        span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
     )
 
+    @State private var annotations: [Location] = []
+    @State private var mapData: Map? = nil
 
-    let map = getMap()
-    let annotations
-    let nodes = map.getNodes()
-    for node in nodes {
-        if (node.isBuliding() == true) {
-            annotations.add(Location(name: node.getName(),
-                coordinate: CLLocationCoordinate2D(latitude: node.getXcord(), node.getYcord())))
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            Map(coordinateRegion: $region, annotationItems: annotations) { location in
+                MapAnnotation(coordinate: location.coordinate) {
+                    Image(systemName: "mappin.circle.fill")
+                        .foregroundColor(getAnnotationColor(for: location))
+                        .scaleEffect(isSelectedLocation(location) ? 1.5 : 1.0)
+                        .onTapGesture {
+                            selectLocation(location)
+                        }
+                }
+            }
+            .ignoresSafeArea()
+
+            // Draw path line
+            if !pathLocations.isEmpty {
+                MapPolyline(coordinates: pathLocations.map { $0.coordinate })
+                    .stroke(.blue, lineWidth: 3)
+            }
+
+            VStack(spacing: 16) {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Start: \(selectedStartLocation?.name ?? "None")")
+                        Text("End: \(selectedEndLocation?.name ?? "None")")
+                    }
+                    Spacer()
+                    Button("Clear") {
+                        clearSelection()
+                    }
+                }
+                .padding()
+                .background(.white)
+                .cornerRadius(8)
+
+                if selectedStartLocation != nil && selectedEndLocation != nil {
+                    Button("Find Path") {
+                        findPath()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+            .padding()
+        }
+        .onAppear {
+            loadMapData()
         }
     }
 
-    var body: some View {
-        // Use a ZStack to layer the detail box on top of the map
-        ZStack(alignment: .bottom) {
+    private func selectLocation(_ location: Location) {
+        if selectedStartLocation == nil {
+            selectedStartLocation = location
+        } else if selectedEndLocation == nil && selectedStartLocation?.id != location.id {
+            selectedEndLocation = location
+        }
+    }
 
-            // Use the Map view, binding it to the defined region
-            Map(coordinateRegion: $region, annotations) { location in
-                MapAnnotation(coordinate: location.coordinate) {
-                    Image(systemName: "mappin.circle.fill")
-                    .foregroundColor(self.selectedLocation?.id == location.id ? .blue : .red)
-                    .scaleEffect(self.selectedLocation?.id == location.id ? 1.5 : 1.0)
-                    .animation(.easeOut(duration: 0.2), value: self.selectedLocation)
-                    .onTapGesture {
-                        // 4. ACTION: When tapped, set the selectedLocation state
-                        self.selectedLocation = location
-                    }
-                }
-            }
-            .ignoresSafeArea()// Optional: Extends map to fill the whole screen
+    private func findPath() {
+        guard let start = selectedStartLocation, let end = selectedEndLocation, let map = mapData else { return }
+        
+        let startNode = map.getNodes().first { $0.getName() == start.name }
+        let endNode = map.getNodes().first { $0.getName() == end.name }
+        
+        guard let startNode = startNode, let endNode = endNode else { return }
+        
+        let path = map.twoWayAStar(from: startNode, to: endNode)
+        pathLocations = path.map { node in
+            Location(name: node.getName(), coordinate: CLLocationCoordinate2D(latitude: node.getXcord(), longitude: node.getYcord()))
+        }
+    }
 
-            if let location = selectedLocation {
-                DetailCalloutView(location: location) {
-                    // Action for the button inside the detail box
-                    print("Button tapped for \(location.name)")
-                }
-                .transition(.move(edge: .bottom)) // Makes it slide in/out
-                .animation(.default, value: selectedLocation)
+    private func clearSelection() {
+        selectedStartLocation = nil
+        selectedEndLocation = nil
+        pathLocations = []
+    }
+
+    private func getAnnotationColor(for location: Location) -> Color {
+        if selectedStartLocation?.id == location.id { return .green }
+        if selectedEndLocation?.id == location.id { return .red }
+        return .blue
+    }
+
+    private func isSelectedLocation(_ location: Location) -> Bool {
+        selectedStartLocation?.id == location.id || selectedEndLocation?.id == location.id
+    }
+
+    private func loadMapData() {
+        Task {
+            let map = await getMap()
+            self.mapData = map
+            let nodes = map.getNodes()
+            self.annotations = nodes.filter { $0.isBuilding() }.map { node in
+                Location(name: node.getName(), coordinate: CLLocationCoordinate2D(latitude: node.getXcord(), longitude: node.getYcord()))
             }
         }
     }
 }
 
-func getMap() -> Map {
-    // 1. Data structure you expect back (using Codable)
+func getMap() async -> Map {
     struct MapResponse: Decodable {
-        struct Node: Decodeable {
+        struct Node: Decodable {
             let id: Int
             let name: String
             let xpos: Double
             let ypos: Double
             let neighbors: [Neighbor]
         }
-
-        struct Neighbor: Decodeable {
+        struct Neighbor: Decodable {
             let id: Int
             let weight: Double
             let count: Int
         }
-
         let nodes: [Node]
     }
 
-    let map
+    let map = Map()
     let response = await fetchData()
+    
     for strNode in response.nodes {
         let node = Node(id: strNode.id, name: strNode.name, xpos: strNode.xpos, ypos: strNode.ypos)
         for neighbor in strNode.neighbors {
@@ -90,40 +146,21 @@ func getMap() -> Map {
         }
         map.addNode(node: node)
     }
-
     return map
 
-    func fetchData() -> MapResponse async {
-        // 2. Define the URL
+    func fetchData() async -> MapResponse {
         guard let url = URL(string: "https://api.example.com/data/123") else {
-            print("Invalid URL")
-            return
+            return MapResponse(nodes: [])
         }
-
         do {
-            // 3. Perform the GET request (default method for data(from:))
             let (data, response) = try await URLSession.shared.data(from: url)
-
-            // Optional: Check the HTTP status code
-            guard let httpResponse = response as? HTTPURLResponse,
-            httpResponse.statusCode == 200 else {
-                print("Server error or unexpected status code.")
-                return
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                return MapResponse(nodes: [])
             }
-
-            // 4. Decode the JSON data into your Swift structure
-            let decodedResponse = try JSONDecoder().decode(MapResponse.self, from: data)
-            print("Successfully fetched data for ID: \(decodedResponse.id)")
-            return decodedResponse
-
+            return try JSONDecoder().decode(MapResponse.self, from: data)
         } catch {
-            // 5. Handle errors (network issues, decoding errors, etc.)
-            print("Error fetching or decoding data: \(error)")
+            print("Error: \(error)")
+            return MapResponse(nodes: [])
         }
     }
-
-    // To run this function, you would call it from an async context:
-    // Task {
-    //     await fetchData()
-    // }
 }
