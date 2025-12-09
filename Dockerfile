@@ -9,7 +9,7 @@ RUN npm install
 
 COPY . ./
 
-ENV PORT=8080, DB_USER="postgres", DB_PASS="aL?c\$ev?y//,|=7N"
+ENV PORT=8080
 
 EXPOSE 8080
 

@@ -5,7 +5,6 @@ Driver that configures and seeds the DB
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -130,11 +129,6 @@ public class DBInit {
         map.addNode(MarshLife);
         map.addNode(Aiken);
         map.addNode(Jeffords);
-        TwoWayAstar astar = new TwoWayAstar();
-
-
-        astar.findPath(Howe, Mcann);
-        System.out.println(astar.getPath());
 
         mapToDB(map);
 

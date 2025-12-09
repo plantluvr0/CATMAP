@@ -6,7 +6,6 @@ import express from 'express'
 //sets up server
 const app = express();
 const port = process.env.PORT;
-console.log(process.env.DB_USER);
 //
 
 //sets up db pool
@@ -27,12 +26,17 @@ const pool = await new Pool({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/', async (req, res) => {
+    //serve html css js
+
+});
+
 app.get('/map', async (req, res) => {
     try {
-        let json = {};
+        let json;
         const { rows } = await pool.query('SELECT * FROM nodes');
         json.nodes = rows;
-        res.status(202).json(json);
+        res.status(202).json(rows);
     } catch (err) {
         console.error('Database connection failed:', err.stack);
         res.status(404).json({message: 'could not retrieve data'})
