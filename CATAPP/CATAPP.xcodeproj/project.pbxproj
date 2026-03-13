@@ -10,9 +10,22 @@
 		2161A4B72EE341860052E84A /* CATAPP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CATAPP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A12D405B2EF70DB5005B8F67 /* Exceptions for "CATAPP" folder in "CATAPP" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				test.swift,
+			);
+			target = 2161A4B62EE341860052E84A /* CATAPP */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2161A4B92EE341860052E84A /* CATAPP */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A12D405B2EF70DB5005B8F67 /* Exceptions for "CATAPP" folder in "CATAPP" target */,
+			);
 			path = CATAPP;
 			sourceTree = "<group>";
 		};
